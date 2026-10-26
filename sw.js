@@ -1,5 +1,5 @@
 // Offline shell: the page itself is network-first, libraries and fonts are cache-first.
-const CACHE = "monkhata-v1";
+const CACHE = "monkhata-v2";
 const SHELL = ["./", "index.html", "firebase-config.js", "manifest.json", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
