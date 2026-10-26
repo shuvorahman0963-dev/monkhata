@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2D6B62">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>মনখাতা</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&family=Tiro+Bangla&display=swap">
+<style>
+/* Layout: one calm column like a pocket notebook; sticky header with tabs; cards only for the four daily blocks */
+:root{
+  --bg:#F1F3EE; --surface:#FFFFFF; --sunk:#E6EAE3; --ink:#1B2631; --muted:#5B6863; --line:#D3D9D0;
+  --accent:#2D6B62; --accent-soft:#DCEBE7; --on-accent:#FFFFFF; --mark:#B97D0C; --mark-soft:#F6EBD3;
+  --good:#2E7A4E; --warn:#A8601A; --bad:#A93838;
+  --f-display:"Tiro Bangla","Noto Serif Bengali",Georgia,serif;
+  --f-body:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;
+  --f-num:ui-monospace,"SF Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161B; --surface:#192027; --sunk:#222B33; --ink:#E3E9E5; --muted:#9AA7A1; --line:#2E3942;
+  --accent:#6FB8AC; --accent-soft:#1F3A36; --on-accent:#0E1A18; --mark:#E2AE4A; --mark-soft:#3A2F1A;
+  --good:#6CC08F; --warn:#E0A05A; --bad:#E07A7A; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#11161B; --surface:#192027; --sunk:#222B33; --ink:#E3E9E5; --muted:#9AA7A1; --line:#2E3942;
+  --accent:#6FB8AC; --accent-soft:#1F3A36; --on-accent:#0E1A18; --mark:#E2AE4A; --mark-soft:#3A2F1A;
+  --good:#6CC08F; --warn:#E0A05A; --bad:#E07A7A; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-block:12px 4px}
+.brand{font-family:var(--f-display);font-size:1.6rem;line-height:1.2;margin:0}
+.status{font-size:.8rem;color:var(--muted);text-align:right}
+.status b{font-weight:500;color:var(--accent)}
+nav{display:flex;gap:4px;overflow-x:auto;padding-block:6px 8px;scrollbar-width:none}
+nav button{flex:0 0 auto;border:0;background:transparent;color:var(--muted);font:inherit;font-size:.95rem;padding:6px 12px;border-radius:999px;cursor:pointer}
+nav button[aria-current="page"]{background:var(--ink);color:var(--bg)}
+main{padding-block:16px 48px;display:grid;gap:18px}
+h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;margin:0;text-wrap:balance}
+h3{font-size:1rem;font-weight:600;margin:0}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:12px;min-width:0}
+.card-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.when{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mark);font-weight:600}
+.daybar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.daybar h2{font-size:1.45rem}
+.iconbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;width:40px;height:40px;font-size:1.2rem;cursor:pointer}
+.hint{background:var(--mark-soft);border-radius:12px;padding:10px 14px;font-size:.92rem}
+.hint b{color:var(--mark)}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--sunk);border:1px solid transparent;border-radius:10px;padding:8px 10px;width:100%;min-width:0}
+input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+textarea{resize:vertical;min-height:120px;line-height:1.7}
+textarea.tall{min-height:260px}
+.dump{display:grid;gap:6px;counter-reset:d}
+.dump-row{display:grid;grid-template-columns:28px 1fr 36px;gap:6px;align-items:center}
+.dump-row .n{font-family:var(--f-num);font-size:.8rem;color:var(--muted);text-align:right}
+.star{border:0;background:transparent;color:var(--line);font-size:1.25rem;cursor:pointer;border-radius:8px;height:36px}
+.star[aria-pressed="true"]{color:var(--mark)}
+.scale{display:flex;gap:6px;flex-wrap:wrap}
+.scale button{flex:1 1 0;min-width:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.85rem;padding:8px 4px;border-radius:10px;cursor:pointer;line-height:1.25}
+.scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.scale.tight button{min-width:34px;padding:6px 2px;font-family:var(--f-num)}
+.field{display:grid;gap:4px;min-width:0}
+.field label,.lbl{font-size:.85rem;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:.9rem;background:var(--surface)}
+.chip input{width:auto;accent-color:var(--accent)}
+.chip:has(input:checked){background:var(--accent-soft);border-color:var(--accent)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);font:inherit;font-size:.92rem;padding:8px 14px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.timer{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tdisp{font-family:var(--f-num);font-variant-numeric:tabular-nums;color:var(--accent);font-weight:600}
+details{border-top:1px dashed var(--line);padding-top:10px}
+summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:10px}
+.cbt{display:grid;gap:8px}
+.cbt textarea{min-height:64px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--sunk);border-radius:12px;padding:10px 12px;min-width:0}
+.stat .v{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-size:1.35rem;font-weight:600}
+.stat .k{font-size:.8rem;color:var(--muted)}
+.who{display:grid;gap:14px}
+.who-q{display:grid;gap:6px}
+.score{font-family:var(--f-num);font-size:1.6rem;font-weight:600}
+.note{border-left:3px solid var(--warn);padding:6px 12px;font-size:.92rem;background:var(--sunk);border-radius:0 10px 10px 0}
+.note.bad{border-color:var(--bad)}
+.qa{display:grid;gap:10px}
+.qa .q{font-weight:500}
+.qa textarea{min-height:70px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row > input{flex:1 1 220px}
+.chart{overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:480px;height:auto}
+.chart text{fill:var(--muted);font-size:11px;font-family:var(--f-num)}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .line{fill:none;stroke:var(--accent);stroke-width:2.2}
+.chart .dot{fill:var(--accent)}
+.chart .bar{fill:var(--mark);opacity:.75}
+.chart .ref{stroke:var(--good);stroke-dasharray:4 4;stroke-width:1.2}
+.pattern{display:grid;gap:4px;padding:12px;border-radius:12px;background:var(--sunk)}
+.pattern .cmp{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.sessions{display:grid;gap:12px}
+.sess{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:10px}
+.sess.done{background:var(--sunk)}
+.sess.locked{opacity:.55}
+.pill{display:inline-block;font-size:.75rem;padding:2px 10px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}
+.pblist{display:flex;gap:8px;flex-wrap:wrap}
+ol.road{margin:0;padding-left:1.2em;display:grid;gap:6px}
+ul.plain{margin:0;padding-left:1.2em;display:grid;gap:4px}
+.sos{width:100%;border:0;background:var(--bad);color:#fff;font:inherit;font-size:1.05rem;font-weight:600;padding:14px;border-radius:12px;cursor:pointer}
+.big{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-size:2.2rem;font-weight:600;line-height:1.1}
+.surf{border:2px solid var(--accent);background:var(--accent-soft)}
+.step{font-size:1.1rem;font-family:var(--f-display);line-height:1.6}
+.reasons{margin:0;padding-left:1.2em;display:grid;gap:2px}
+.cal{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;max-width:420px}
+.cal span{aspect-ratio:1;border-radius:6px;background:var(--sunk);max-width:100%}
+.cal span.ok{background:var(--good)}
+.cal span.lapse{background:var(--bad)}
+.cal span.half{background:var(--warn)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:middle}
+.bars{display:grid;gap:6px}
+.barrow{display:grid;grid-template-columns:minmax(0,9em) 1fr 2.5em;gap:8px;align-items:center;font-size:.88rem}
+.barrow .track{background:var(--sunk);border-radius:6px;height:10px;overflow:hidden}
+.barrow .fill{background:var(--mark);height:100%}
+.barrow .c{font-family:var(--f-num);text-align:right}
+.urge{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:8px 10px;border-radius:10px;background:var(--sunk);font-size:.9rem}
+.ifthen{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media (max-width:520px){.ifthen{grid-template-columns:1fr}}
+.empty{padding:20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <h1 class="brand">মনখাতা</h1>
+      <div class="status" id="status">লোড হচ্ছে…</div>
+    </div>
+    <nav id="tabs" aria-label="বিভাগ">
+      <button data-tab="today">আজ</button>
+      <button data-tab="week">সাপ্তাহিক</button>
+      <button data-tab="deep">গভীর লেখা</button>
+      <button data-tab="reset">রিসেট</button>
+      <button data-tab="insights">ইনসাইট</button>
+      <button data-tab="guide">গাইড</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap" id="main"></main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+const HABITS=[["meditation","মেডিটেশন"],["prayer","নামাজ / প্রার্থনা"],["study","পড়াশোনা"],["sunlight","সকালের রোদ"],["social","কারো সাথে কথা / দেখা"],["nophone","ঘুমের আগে ফোন বন্ধ"]];
+const MOODS=["খুব খারাপ","খারাপ","ঠিকঠাক","ভালো","খুব ভালো"];
+const LEVELS=["খুব কম","কম","মাঝারি","বেশি","খুব বেশি"];
+const WHO5=["আমি প্রফুল্ল ও ভালো মেজাজে ছিলাম","আমি শান্ত ও নির্ভার অনুভব করেছি","আমি সক্রিয় ও উদ্যমী অনুভব করেছি","ঘুম থেকে উঠে সতেজ ও বিশ্রাম নেওয়া লেগেছে","আমার প্রতিদিনের জীবন আগ্রহের জিনিসে ভরা ছিল"];
+const WHO5_OPTS=["কখনো না","মাঝে মাঝে","অর্ধেকের কম সময়","অর্ধেকের বেশি সময়","বেশিরভাগ সময়","সবসময়"];
+const BN_MONTHS=["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
+const BN_DAYS=["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
+const LOCAL_KEY="monkhata-v1";
+const TRIGGERS=["একা থাকা","বোরডম","স্ট্রেস","মন খারাপ","রাতে বিছানায় ফোন","সোশ্যাল মিডিয়া স্ক্রল","ঘুম আসছে না","ঝগড়া বা রাগ","কোনো ছবি বা ভিডিও চোখে পড়েছে","অন্য কিছু"];
+const HALT=["ক্ষুধা","রাগ","একাকীত্ব","ক্লান্তি"];
+const OUTCOMES=[["passed","তাড়না চলে গেছে"],["alt","বিকল্প কাজ করেছি"],["lost","হেরে গেছি"]];
+const ALTS=["রুম থেকে বের হও, দরজা খোলা রাখো","ঠান্ডা পানিতে মুখ ধোও বা গোসল করো","২০টা পুশ-আপ বা স্কোয়াট","কাউকে ফোন বা মেসেজ দাও","ওজু করে নামাজ পড়ো বা দোয়া করো","বাইরে ১০ মিনিট হাঁটো","ফোন অন্য রুমে রেখে আসো"];
+const ENV=[["blocker","ফোন আর কম্পিউটারে কনটেন্ট ব্লকার চালু"],["phoneout","রাতে ফোন বেডরুমের বাইরে"],["cleanfeed","ট্রিগার করে এমন অ্যাকাউন্ট আনফলো"],["deleted","সেভ করা কনটেন্ট মুছে ফেলেছি"],["partner","একজন বিশ্বস্ত মানুষ জানে (accountability)"],["sleep","প্রতিদিন একই সময়ে ঘুম"]];
+const SURF_STEPS=[[0,"থামো। ৫টা ধীর নিঃশ্বাস নাও: ৪ সেকেন্ডে নাও, ৬ সেকেন্ডে ছাড়ো।"],[2,"তাড়নাটা শরীরের কোথায় টের পাচ্ছ? শুধু লক্ষ্য করো। লড়াই করতে হবে না, মানতেও হবে না।"],[5,"এটা একটা ঢেউ। উঠছে, চূড়ায় যাবে, তারপর নামবে। তুমি ঢেউয়ের ওপর ভাসছ, ডুবছ না।"],[10,"এখন তীব্রতা কত? খেয়াল করো, শুরুর চেয়ে কমেছে কিনা। চাইলে নিচের একটা বিকল্প কাজ করো।"],[15,"ঢেউ পার হয়ে গেছ। নিচে লিখে রাখো কী সাহায্য করেছে।"]];
+const blankRec=()=>({p:null,m:null,urges:[],review:{before:"",feeling:"",thought:"",moment:"",next:"",kind:""},reflect:""});
+
+const main=document.getElementById("main");
+const statusEl=document.getElementById("status");
+const bn=n=>String(n).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const z=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate());
+const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return ymd(d)};
+const monday=s=>{const d=parse(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return ymd(d)};
+const today=()=>ymd(new Date());
+const fmtDate=s=>{const d=parse(s);return bn(d.getDate())+" "+BN_MONTHS[d.getMonth()]+", "+BN_DAYS[d.getDay()]};
+const fmtShort=s=>{const d=parse(s);return bn(d.getDate())+" "+BN_MONTHS[d.getMonth()]};
+const words=t=>(t||"").trim().split(/\s+/).filter(Boolean).length;
+const num=v=>v===""||v==null||isNaN(Number(v))?null:Number(v);
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+const fix=(v,d=1)=>v==null?"–":bn(v.toFixed(d));
+
+/* ---------- data ---------- */
+let store=null, loaded=false;
+let docs={};
+const dirty=new Set(), timers={}, writing={}, ver={};
+let view={tab:"today",date:today(),rdate:today(),week:monday(today()),pb:null,aiMsg:"",surf:null};
+
+function blank(id){
+  if(id==="recovery") return {kind:"recovery",start:"",reasons:["","","","",""],ifthen:[0,1,2,3,4].map(()=>({if:"",then:""})),env:{}};
+  if(id.startsWith("day-")) return {kind:"day",date:id.slice(4),dump:Array(10).fill(""),focus:null,mood:null,energy:null,stress:null,bed:"",wake:"",exercise:"",water:"",screen:"",deepwork:"",habits:{},grat:["","",""],free:"",cbt:{situation:"",thought:"",evidence:"",balanced:""}};
+  if(id.startsWith("week-")) return {kind:"week",start:id.slice(5),who5:[null,null,null,null,null],ai:{topic:"",qs:[],as:["","","","",""]},bps:"",review:""};
+  return {kind:"pb",title:"",created:today(),sessions:[0,1,2,3].map(()=>({text:"",before:null,after:null,done:false,date:""}))};
+}
+const doc=id=>docs[id]||(docs[id]=blank(id));
+const peek=id=>docs[id]||null;
+
+function setPath(o,path,val){
+  const ks=path.split(".");let t=o;
+  for(let i=0;i<ks.length-1;i++){const k=ks[i];if(t[k]==null)t[k]=/^\d+$/.test(ks[i+1])?[]:{};t=t[k]}
+  t[ks[ks.length-1]]=val;
+}
+const getPath=(o,path)=>path.split(".").reduce((t,k)=>t==null?t:t[k],o);
+
+function touch(id){
+  dirty.add(id);ver[id]=(ver[id]||0)+1;
+  setStatus("saving");
+  clearTimeout(timers[id]);timers[id]=setTimeout(()=>flush(id),900);
+}
+async function flush(id){
+  if(writing[id]){timers[id]=setTimeout(()=>flush(id),400);return}
+  writing[id]=true;const v=ver[id];
+  const data=JSON.parse(JSON.stringify({...docs[id],updated:Date.now()}));
+  try{
+    if(store.mode==="cloud") store.col.doc(id).set(data).catch(()=>setStatus("error","সেভ হয়নি, আবার লগইন করে দেখো"));
+    else saveLocal();
+    if(ver[id]===v) dirty.delete(id);
+    setStatus(dirty.size?"saving":"saved");
+  }catch(e){
+    setStatus("error",e&&e.code==="quota_exceeded"?"জায়গা শেষ, পুরনো লেখা মুছতে হবে":"সেভ হয়নি, আবার চেষ্টা হচ্ছে");
+    timers[id]=setTimeout(()=>flush(id),4000);
+  }finally{writing[id]=false}
+}
+function saveLocal(){try{localStorage.setItem(LOCAL_KEY,JSON.stringify(docs))}catch(e){}}
+function loadLocal(){try{const s=localStorage.getItem(LOCAL_KEY);if(s)docs=JSON.parse(s)||{}}catch(e){docs={}}}
+
+function setStatus(kind,msg){
+  const where=store?.mode==="cloud"?"<b>সব ডিভাইসে সিঙ্ক</b>":store?.mode==="signin"?"লগইন দরকার":"শুধু এই ডিভাইসে সেভ";
+  const s=kind==="saving"?"সেভ হচ্ছে…":kind==="error"?msg:kind==="saved"?"সেভ হয়েছে":"";
+  statusEl.innerHTML=where+(s?"<br>"+esc(s):"");
+}
+
+let unsub=null;
+async function init(){
+  render();
+  const cfg=window.FIREBASE_CONFIG;
+  if(!(window.firebase&&cfg&&cfg.apiKey&&!String(cfg.apiKey).startsWith("PASTE"))){
+    store={mode:"local"};loadLocal();loaded=true;setStatus("");render();return;
+  }
+  firebase.initializeApp(cfg);
+  const fs=firebase.firestore();
+  try{await fs.enablePersistence({synchronizeTabs:true})}catch(e){}
+  firebase.auth().onAuthStateChanged(u=>{
+    if(unsub){unsub();unsub=null}
+    docs={};dirty.clear();
+    if(!u){store={mode:"signin"};loaded=true;setStatus("");render();return}
+    store={mode:"cloud",col:fs.collection("users").doc(u.uid).collection("docs")};loaded=false;render();
+    unsub=store.col.onSnapshot(onSnap,()=>setStatus("error","সিঙ্ক বন্ধ হয়ে গেছে, পেজ রিলোড করো"));
+  });
+}
+function rSignin(){
+  return `<section class="card"><h2>লগইন করো</h2>
+    <p>মোবাইল আর কম্পিউটারে একই লেখা দেখতে Google অ্যাকাউন্ট দিয়ে লগইন করো। তোমার লেখা শুধু তুমি দেখতে পারবে।</p>
+    ${view.authMsg?`<p class="small" style="color:var(--bad)">${esc(view.authMsg)}</p>`:""}
+    <div><button class="btn" data-act="signin">Google দিয়ে লগইন</button></div></section>`;
+}
+function onSnap(snap){
+  for(const ch of snap.docChanges()){
+    const id=ch.doc.id;
+    if(dirty.has(id))continue;
+    if(ch.type==="removed")delete docs[id];
+    else docs[id]=JSON.parse(JSON.stringify(ch.doc.data()));
+  }
+  const first=!loaded;loaded=true;
+  if(first)setStatus("");
+  const a=document.activeElement;
+  if(first||!(a&&main.contains(a)&&(a.tagName==="TEXTAREA"||a.tagName==="INPUT")))render();
+}
+
+/* ---------- derived ---------- */
+const mins=t=>{if(!t)return null;const [h,m]=t.split(":").map(Number);return h*60+m};
+function sleepHrs(d){const b=mins(d.bed),w=mins(d.wake);if(b==null||w==null)return null;let x=w-b;if(x<=0)x+=1440;return x/60}
+const journaled=d=>!!d&&((d.dump||[]).some(x=>x&&x.trim())||(d.grat||[]).some(x=>x&&x.trim())||!!(d.free&&d.free.trim()));
+function dayList(){return Object.keys(docs).filter(k=>k.startsWith("day-")).map(k=>docs[k]).sort((a,b)=>a.date<b.date?-1:1)}
+function streak(){
+  let s=today(),n=0;
+  if(!journaled(peek("day-"+s)))s=addDays(s,-1);
+  while(journaled(peek("day-"+s))){n++;s=addDays(s,-1)}
+  return n;
+}
+function phase(){
+  const first=dayList().find(journaled);
+  if(!first)return {w:0,text:"আজ প্রথম দিন। শুধু সকালের ১০টা চিন্তা লিখে শুরু করো।"};
+  const days=Math.round((parse(today())-parse(first.date))/864e5);const w=Math.floor(days/7)+1;
+  const t=w<=2?"শুধু সকালের Thought Dump আর রাতের ৩টা কৃতজ্ঞতা লিখলেই যথেষ্ট।"
+    :w<=4?"এখন রাতের চেক-ইন আর ৫ মিনিট Free Flow যোগ করো।"
+    :w<=8?"এখন শুক্রবারে সাপ্তাহিক রিভিউ যোগ করো।"
+    :w<=13?"দরকার মনে হলে ‘গভীর লেখা’ প্রোটোকলটা একবার করো।"
+    :"৩ মাস পূর্ণ হয়েছে। পুরনো লেখাগুলো পড়ে দেখো, কী বদলেছে।";
+  return {w,text:t};
+}
+function sd(a){if(a.length<2)return null;const m=avg(a);return Math.sqrt(avg(a.map(x=>(x-m)**2)))}
+function weekStats(start){
+  const ds=[0,1,2,3,4,5,6].map(i=>peek("day-"+addDays(start,i))).filter(Boolean);
+  const moods=ds.map(d=>d.mood).filter(v=>v!=null);
+  const sl=ds.map(sleepHrs).filter(v=>v!=null);
+  const wk=ds.map(d=>mins(d.wake)).filter(v=>v!=null);
+  return {mood:avg(moods),sleep:avg(sl),wakeSd:sd(wk),ex:ds.reduce((s,d)=>s+(num(d.exercise)||0),0),
+    jdays:ds.filter(journaled).length,screen:avg(ds.map(d=>num(d.screen)).filter(v=>v!=null))};
+}
+
+/* ---------- render ---------- */
+function render(){
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===view.tab?"page":"false"));
+  if(!loaded){main.innerHTML='<div class="empty">তোমার খাতা খোলা হচ্ছে…</div>';return}
+  if(store&&store.mode==="signin"){main.innerHTML=rSignin();return}
+  main.innerHTML=({today:rToday,week:rWeek,deep:rDeep,reset:rReset,insights:rInsights,guide:rGuide}[view.tab])();
+  tick();
+}
+
+function scale(path,val,labels,start=1){
+  return '<div class="scale" role="group">'+labels.map((l,i)=>{const v=i+start;
+    return `<button type="button" data-set="${path}" data-v="${v}" aria-pressed="${val===v}">${esc(l)}</button>`}).join("")+"</div>";
+}
+function numScale(path,val,from,to){
+  let s='<div class="scale tight" role="group">';
+  for(let v=from;v<=to;v++)s+=`<button type="button" data-set="${path}" data-v="${v}" aria-pressed="${val===v}">${bn(v)}</button>`;
+  return s+"</div>";
+}
+function timerUI(key,min,label){
+  return `<div class="timer"><button type="button" class="btn ghost" data-timer="${key}" data-min="${min}">${label}</button><span class="tdisp" data-tdisp="${key}"></span></div>`;
+}
+
+function rToday(){
+  const id="day-"+view.date,d=doc(id),ph=phase(),st=streak();
+  const isToday=view.date===today();
+  return `
+  <div class="daybar">
+    <button class="iconbtn" data-nav="-1" aria-label="আগের দিন">‹</button>
+    <div style="text-align:center;min-width:0"><h2>${fmtDate(view.date)}</h2>
+      <p class="small muted">${isToday?"আজ":`<button class="btn ghost" style="padding:2px 10px" data-nav="0">আজকে ফেরো</button>`} · টানা ${bn(st)} দিন</p></div>
+    <button class="iconbtn" data-nav="1" aria-label="পরের দিন" ${isToday?"disabled":""}>›</button>
+  </div>
+  <div class="hint">${ph.w?`<b>সপ্তাহ ${bn(ph.w)}</b> · `:""}${esc(ph.text)}</div>
+
+  <section class="card" data-doc="${id}">
+    <div class="card-head"><h2>সকাল: মাথা খালি করো</h2><span class="when">৫ মিনিট</span></div>
+    <p class="small muted">মাথায় যা ঘুরছে এমন ১০টা চিন্তা লেখো। সমাধান করবে না, শুধু নামিয়ে রাখো। আজ যেটা করবে তাতে তারা দাও।</p>
+    <div class="dump">${d.dump.map((t,i)=>`<div class="dump-row"><span class="n">${bn(i+1)}</span>
+      <input id="dump-${i}" data-f="dump.${i}" value="${esc(t)}" aria-label="চিন্তা ${bn(i+1)}">
+      <button type="button" class="star" data-focus="${i}" aria-pressed="${d.focus===i}" aria-label="আজকের ফোকাস">★</button></div>`).join("")}</div>
+  </section>
+
+  <section class="card" data-doc="${id}">
+    <div class="card-head"><h2>চেক-ইন</h2><span class="when">২ মিনিট</span></div>
+    <div class="field"><span class="lbl">মুড</span>${scale("mood",d.mood,MOODS)}</div>
+    <div class="field"><span class="lbl">এনার্জি</span>${scale("energy",d.energy,LEVELS)}</div>
+    <div class="field"><span class="lbl">স্ট্রেস</span>${scale("stress",d.stress,LEVELS)}</div>
+    <div class="grid2">
+      <div class="field"><label for="bed">গতরাতে ঘুমাতে গেছি</label><input id="bed" type="time" data-f="bed" value="${esc(d.bed)}"></div>
+      <div class="field"><label for="wake">ঘুম থেকে উঠেছি</label><input id="wake" type="time" data-f="wake" value="${esc(d.wake)}"></div>
+      <div class="field"><label for="exercise">ব্যায়াম / হাঁটা (মিনিট)</label><input id="exercise" type="number" inputmode="numeric" min="0" data-f="exercise" value="${esc(d.exercise)}"></div>
+      <div class="field"><label for="water">পানি (গ্লাস)</label><input id="water" type="number" inputmode="numeric" min="0" data-f="water" value="${esc(d.water)}"></div>
+      <div class="field"><label for="screen">স্ক্রিন টাইম (ঘণ্টা)</label><input id="screen" type="number" inputmode="decimal" min="0" step="0.5" data-f="screen" value="${esc(d.screen)}"></div>
+      <div class="field"><label for="deepwork">ফোকাসড কাজ (মিনিট)</label><input id="deepwork" type="number" inputmode="numeric" min="0" data-f="deepwork" value="${esc(d.deepwork)}"></div>
+    </div>
+    <p class="small muted">ঘুম: ${sleepHrs(d)==null?"সময় দুটো দিলে হিসাব হবে":fix(sleepHrs(d))+" ঘণ্টা"}</p>
+    <div class="field"><span class="lbl">আজকের অভ্যাস</span><div class="chips">${HABITS.map(([k,l])=>`<label class="chip"><input type="checkbox" id="h-${k}" data-f="habits.${k}" ${d.habits?.[k]?"checked":""}>${l}</label>`).join("")}</div></div>
+  </section>
+
+  <section class="card" data-doc="${id}">
+    <div class="card-head"><h2>রাত: কৃতজ্ঞতা আর খোঁজা</h2><span class="when">১০ মিনিট</span></div>
+    <div class="field"><span class="lbl">আজ যে ৩টা জিনিসের জন্য কৃতজ্ঞ (নির্দিষ্ট করে লেখো)</span>
+      ${d.grat.map((t,i)=>`<input id="grat-${i}" data-f="grat.${i}" value="${esc(t)}" placeholder="${["যেমন: আম্মু আজ ফোন করেছিল","",""][i]}" aria-label="কৃতজ্ঞতা ${bn(i+1)}">`).join("")}</div>
+    <div class="field"><span class="lbl">Free Flow: দিনের কোন জিনিসটা মনে খচখচ করছে? ৫ মিনিট না থেমে লেখো। কিছু না এলে লেখো “কিছু মাথায় আসছে না”।</span>
+      ${timerUI("free",5,"৫ মিনিট টাইমার")}
+      <textarea id="free" data-f="free" placeholder="লিখতে থাকো…">${esc(d.free)}</textarea>
+      <span class="small muted">${bn(words(d.free))} শব্দ</span></div>
+    <details ${d.cbt.thought?"open":""}><summary>একটা নেগেটিভ চিন্তা বারবার আসছে? (CBT)</summary>
+      <div class="cbt">
+        <label class="lbl" for="cbt-s">কী ঘটেছিল</label><textarea id="cbt-s" data-f="cbt.situation">${esc(d.cbt.situation)}</textarea>
+        <label class="lbl" for="cbt-t">মাথায় যে চিন্তাটা এসেছিল</label><textarea id="cbt-t" data-f="cbt.thought">${esc(d.cbt.thought)}</textarea>
+        <label class="lbl" for="cbt-e">এর পক্ষে আর বিপক্ষে প্রমাণ কী</label><textarea id="cbt-e" data-f="cbt.evidence">${esc(d.cbt.evidence)}</textarea>
+        <label class="lbl" for="cbt-b">আরও ব্যালান্সড চিন্তা</label><textarea id="cbt-b" data-f="cbt.balanced">${esc(d.cbt.balanced)}</textarea>
+      </div></details>
+  </section>`;
+}
+
+function rWeek(){
+  const id="week-"+view.week,w=doc(id),s=weekStats(view.week);
+  const end=addDays(view.week,6),isCur=view.week===monday(today());
+  const answered=w.who5.filter(v=>v!=null).length;
+  const pct=answered===5?w.who5.reduce((a,b)=>a+b,0)*4:null;
+  const ai=w.ai||{topic:"",qs:[],as:[]};
+  return `
+  <div class="daybar">
+    <button class="iconbtn" data-wnav="-7" aria-label="আগের সপ্তাহ">‹</button>
+    <div style="text-align:center"><h2>${fmtShort(view.week)} – ${fmtShort(end)}</h2><p class="small muted">${isCur?"এই সপ্তাহ":"আগের সপ্তাহ"} · রিভিউয়ের সেরা দিন শুক্রবার</p></div>
+    <button class="iconbtn" data-wnav="7" aria-label="পরের সপ্তাহ" ${isCur?"disabled":""}>›</button>
+  </div>
+  <section class="card">
+    <h2>সপ্তাহের হিসাব</h2>
+    <div class="stats">
+      <div class="stat"><div class="v">${fix(s.mood)}</div><div class="k">গড় মুড (৫-এ)</div></div>
+      <div class="stat"><div class="v">${fix(s.sleep)}</div><div class="k">গড় ঘুম (ঘণ্টা)</div></div>
+      <div class="stat"><div class="v">${s.wakeSd==null?"–":bn(Math.round(s.wakeSd))}</div><div class="k">ঘুম থেকে ওঠার সময়ের হেরফের (মিনিট)</div></div>
+      <div class="stat"><div class="v">${bn(s.ex)}</div><div class="k">মোট ব্যায়াম (মিনিট)</div></div>
+      <div class="stat"><div class="v">${bn(s.jdays)}/৭</div><div class="k">জার্নালিং করা দিন</div></div>
+      <div class="stat"><div class="v">${fix(s.screen)}</div><div class="k">গড় স্ক্রিন টাইম (ঘণ্টা)</div></div>
+    </div>
+    <p class="small muted">ঘুম থেকে ওঠার সময় যত নিয়মিত (হেরফের যত কম), গবেষণায় মন তত ভালো থাকতে দেখা গেছে।</p>
+  </section>
+
+  <section class="card" data-doc="${id}">
+    <div class="card-head"><h2>WHO-5 সুস্থতা স্কোর</h2><span class="when">১ মিনিট</span></div>
+    <p class="small muted">গত এক সপ্তাহে কতটা সময় এমন লেগেছে?</p>
+    <div class="who">${WHO5.map((q,i)=>`<div class="who-q"><span>${bn(i+1)}. ${q}</span>${scale("who5."+i,w.who5[i],WHO5_OPTS,0)}</div>`).join("")}</div>
+    ${pct==null?`<p class="small muted">৫টার উত্তর দিলে স্কোর দেখাবে (${bn(answered)}/৫)</p>`:
+      `<div><span class="score">${bn(pct)}%</span> <span class="muted small">(১০০-এর মধ্যে, বেশি মানে ভালো)</span></div>
+       ${pct<=28?`<div class="note bad">স্কোর অনেক কম। একজন সাইকিয়াট্রিস্ট বা কাউন্সেলরের সাথে কথা বলো। জরুরি অবস্থায় ৯৯৯-এ ফোন করো।</div>`:
+         pct<=50?`<div class="note">স্কোর ৫০%-এর নিচে। কয়েক সপ্তাহ এমন থাকলে একজন মানসিক স্বাস্থ্য বিশেষজ্ঞের সাথে কথা বলো।</div>`:""}`}
+  </section>
+
+  <section class="card" data-doc="${id}">
+    <div class="card-head"><h2>AI-এর ৫ প্রশ্ন</h2><span class="when">১০ মিনিট</span></div>
+    <p class="small muted">এই সপ্তাহের বড় সমস্যা বা বিষয়টা লেখো। AI প্রশ্ন দেবে, উত্তর লিখবে তুমি।</p>
+    <div class="row"><input id="ai-topic" data-f="ai.topic" value="${esc(ai.topic)}" placeholder="যেমন: পড়ায় মন বসছে না কেন">
+      <button class="btn" data-act="genq">AI-এর প্রম্পট কপি করো</button></div>
+    ${view.aiMsg?`<p class="small muted">${esc(view.aiMsg)}</p>`:""}
+    <div class="qa">${[0,1,2,3,4].map(i=>`<div class="field"><input id="ai-q-${i}" data-f="ai.qs.${i}" value="${esc((ai.qs||[])[i])}" placeholder="প্রশ্ন ${bn(i+1)} এখানে পেস্ট করো" aria-label="প্রশ্ন ${bn(i+1)}"><textarea id="ai-a-${i}" data-f="ai.as.${i}" placeholder="উত্তর" aria-label="উত্তর ${bn(i+1)}">${esc((ai.as||[])[i])}</textarea></div>`).join("")}</div>
+  </section>
+
+  <section class="card" data-doc="${id}">
+    <div class="card-head"><h2>Best Possible Self</h2><span class="when">১০ মিনিট</span></div>
+    <p class="small muted">কল্পনা করো ১ বছর পরে সবকিছু ঠিকঠাক গেছে। তুমি কোথায়, কী করছ, কেমন লাগছে? বিস্তারিত লেখো।</p>
+    ${timerUI("bps",10,"১০ মিনিট টাইমার")}
+    <textarea id="bps" class="tall" data-f="bps">${esc(w.bps)}</textarea>
+    <label class="lbl" for="review">সপ্তাহ থেকে কী শিখলাম, সামনের সপ্তাহে কী বদলাব</label>
+    <textarea id="review" data-f="review">${esc(w.review)}</textarea>
+  </section>`;
+}
+
+function rDeep(){
+  const pbs=Object.keys(docs).filter(k=>k.startsWith("pb-")).sort().reverse();
+  if(view.pb&&!docs[view.pb])view.pb=null;
+  if(!view.pb&&pbs.length)view.pb=pbs[0];
+  const intro=`
+  <section class="card">
+    <h2>গভীর লেখা (Pennebaker প্রোটোকল)</h2>
+    <p>পুরনো কোনো কষ্ট বারবার মনে পড়লে, বা ঘুমে বা কাজে সমস্যা করলে এটা করো। <b>একই ঘটনা নিয়ে ৪ বার</b> লিখবে, টানা ৪ দিন বা সপ্তাহে ১ বার করে। প্রতিবার ১৫–২০ মিনিট।</p>
+    <ul class="plain small">
+      <li>প্রথমবার মাঝারি কষ্টের ঘটনা বেছে নাও, সবচেয়ে বড়টা না।</li>
+      <li>ঘুমের আগে করবে না। লেখার পরে ১০ মিনিট বিরতি রাখো।</li>
+      <li>লেখার সময় মন খারাপ হওয়া, কান্না পাওয়া স্বাভাবিক। খুব বেশি কষ্ট হলে থামিয়ে দাও।</li>
+    </ul>
+    <div class="row"><input id="pb-title" placeholder="ঘটনার একটা ছোট নাম (শুধু তুমি দেখবে)">
+      <button class="btn" data-act="newpb">নতুন প্রোটোকল শুরু</button></div>
+    ${pbs.length>1?`<div class="pblist">${pbs.map(k=>`<button class="btn ${k===view.pb?"":"ghost"}" data-pb="${k}">${esc(docs[k].title||"নামহীন")}</button>`).join("")}</div>`:""}
+  </section>`;
+  if(!view.pb)return intro+`<div class="empty">এখনো কোনো প্রোটোকল শুরু করোনি। উপরে ঘটনার নাম দিয়ে শুরু করো।</div>`;
+  const p=docs[view.pb];
+  const sess=p.sessions.map((s,i)=>{
+    const locked=i>0&&!p.sessions[i-1].done;
+    const prev=i>0?p.sessions[i-1]:null;
+    return `<div class="sess ${s.done?"done":""} ${locked?"locked":""}">
+      <div class="card-head"><h3>সেশন ${bn(i+1)}</h3><span class="pill ${s.done?"ok":""}">${s.done?"শেষ · "+fmtShort(s.date):locked?"আগেরটা শেষ করো":"এখন লেখো"}</span></div>
+      ${locked?(prev&&prev.date?`<p class="small muted">পরের দিন বা এক সপ্তাহের মধ্যে লেখো।</p>`:""):s.done?
+        `<p class="small muted">${bn(words(s.text))} শব্দ · কষ্ট আগে ${s.before==null?"–":bn(s.before)} → পরে ${s.after==null?"–":bn(s.after)} (১০-এর মধ্যে)</p>
+         <details><summary>লেখাটা দেখো</summary><textarea id="pb-t-${i}" class="tall" data-f="sessions.${i}.text">${esc(s.text)}</textarea></details>`:
+        `<div class="field"><span class="lbl">শুরুর আগে কষ্ট কতটা (১–১০)</span>${numScale(`sessions.${i}.before`,s.before,1,10)}</div>
+         <p class="small">লেখায় তিনটা জিনিস রাখো: <b>কী ঘটেছিল</b>, <b>তখন আর এখন কেমন লাগে</b>, আর <b>জীবনের অন্য অংশের সাথে এর সংযোগ</b>। বানান নিয়ে ভাববে না, থামবে না।</p>
+         ${timerUI("pb"+i,20,"২০ মিনিট টাইমার")}
+         <textarea id="pb-t-${i}" class="tall" data-f="sessions.${i}.text">${esc(s.text)}</textarea>
+         <span class="small muted">${bn(words(s.text))} শব্দ</span>
+         <div class="field"><span class="lbl">লেখার পরে কষ্ট কতটা (১–১০)</span>${numScale(`sessions.${i}.after`,s.after,1,10)}</div>
+         <button class="btn" data-act="pbdone" data-i="${i}" ${words(s.text)<20?"disabled":""}>সেশন শেষ</button>`}
+    </div>`}).join("");
+  const doneN=p.sessions.filter(s=>s.done).length;
+  return intro+`<section class="card" data-doc="${view.pb}">
+    <div class="card-head"><h2>${esc(p.title||"নামহীন")}</h2><span class="pill">${bn(doneN)}/৪ সেশন</span></div>
+    ${doneN>0&&doneN<4?`<div class="hint">শেষ সেশনের পরে ১০ মিনিট বিরতি নাও: মুখে পানি দাও, ধীরে নিঃশ্বাস নাও।</div>`:""}
+    ${doneN===4?`<div class="hint"><b>প্রোটোকল শেষ।</b> এক সপ্তাহ পরে ৪টা লেখা পড়ে দেখো: নেগেটিভ শব্দ কমেছে কিনা, গল্পটা আরও গোছানো হয়েছে কিনা।</div>`:""}
+    <div class="sessions">${sess}</div>
+  </section>`;
+}
+
+function rInsights(){
+  const days=[];for(let i=29;i>=0;i--){const s=addDays(today(),-i);days.push({date:s,d:peek("day-"+s)})}
+  const filled=days.filter(x=>x.d);
+  if(!filled.some(x=>x.d.mood!=null||journaled(x.d)))
+    return `<div class="empty">গত ৩০ দিনের মুড, ঘুম আর অভ্যাসের গ্রাফ এখানে দেখাবে। ‘আজ’ ট্যাবে চেক-ইন দিলে শুরু হবে।</div>`;
+  const W=640,H=150,L=28,R=8,T=10,B=24,iw=W-L-R,ih=H-T-B,step=iw/29;
+  const x=i=>L+i*step;
+  let mood=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="৩০ দিনের মুড">`;
+  for(let v=1;v<=5;v++){const y=T+(5-v)/4*ih;mood+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${y}" y2="${y}"/><text x="${L-8}" y="${y+4}" text-anchor="end">${v}</text>`}
+  let seg=[],paths=[];
+  days.forEach((o,i)=>{const m=o.d?.mood;if(m!=null)seg.push([x(i),T+(5-m)/4*ih]);else if(seg.length){paths.push(seg);seg=[]}});
+  if(seg.length)paths.push(seg);
+  paths.forEach(p=>{mood+=`<polyline class="line" points="${p.map(q=>q.join(",")).join(" ")}"/>`;p.forEach(q=>mood+=`<circle class="dot" cx="${q[0]}" cy="${q[1]}" r="3"/>`)});
+  [0,7,14,21,29].forEach(i=>mood+=`<text x="${x(i)}" y="${H-6}" text-anchor="middle">${fmtShort(days[i].date)}</text>`);
+  mood+="</svg>";
+  let sleep=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="৩০ দিনের ঘুম">`;
+  [0,4,8,12].forEach(v=>{const y=T+(12-v)/12*ih;sleep+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${y}" y2="${y}"/><text x="${L-8}" y="${y+4}" text-anchor="end">${v}</text>`});
+  const y7=T+(12-7)/12*ih;sleep+=`<line class="ref" x1="${L}" x2="${W-R}" y1="${y7}" y2="${y7}"/>`;
+  days.forEach((o,i)=>{const h=o.d?sleepHrs(o.d):null;if(h!=null){const hh=Math.min(h,12)/12*ih;sleep+=`<rect class="bar" x="${x(i)-step*0.35}" y="${T+ih-hh}" width="${step*0.7}" height="${hh}" rx="2"/>`}});
+  [0,7,14,21,29].forEach(i=>sleep+=`<text x="${x(i)}" y="${H-6}" text-anchor="middle">${fmtShort(days[i].date)}</text>`);
+  sleep+="</svg>";
+
+  const all=dayList().filter(d=>d.mood!=null);
+  const cmp=(label,pa,la,lb)=>{
+    const a=all.filter(pa),b=all.filter(d=>!pa(d)&&pa(d)!==null);
+    const ma=avg(a.map(d=>d.mood)),mb=avg(b.map(d=>d.mood));
+    if(a.length<3||b.length<3)return `<div class="pattern"><h3>${label}</h3><p class="small muted">আরও ডেটা দরকার (প্রতি দলে অন্তত ৩ দিন)। এখন: ${bn(a.length)} আর ${bn(b.length)} দিন।</p></div>`;
+    const diff=ma-mb;
+    return `<div class="pattern"><h3>${label}</h3><p class="cmp">${la}: গড় মুড ${fix(ma)} · ${lb}: ${fix(mb)}</p>
+      <p class="small muted">${Math.abs(diff)<0.3?"তেমন পার্থক্য দেখা যাচ্ছে না।":diff>0?`${la} দিনগুলোতে মুড ${fix(diff)} পয়েন্ট ভালো।`:`${lb} দিনগুলোতে মুড ${fix(-diff)} পয়েন্ট ভালো।`}</p></div>`;
+  };
+  const hasSleep=d=>sleepHrs(d)!=null;
+  const patterns=[
+    cmp("ঘুম আর মুড",d=>hasSleep(d)?sleepHrs(d)>=7:null,"৭+ ঘণ্টা ঘুম","৭ ঘণ্টার কম"),
+    cmp("ব্যায়াম আর মুড",d=>num(d.exercise)==null?null:num(d.exercise)>=20,"২০+ মিনিট ব্যায়াম","কম বা না"),
+    cmp("স্ক্রিন টাইম আর মুড",d=>num(d.screen)==null?null:num(d.screen)<=5,"৫ ঘণ্টা বা কম স্ক্রিন","৫ ঘণ্টার বেশি"),
+    cmp("জার্নালিং আর মুড",d=>journaled(d),"জার্নালিং করা দিন","না করা দিন"),
+    cmp("রিসেট আর মুড",d=>d.rec&&(d.rec.p!=null||d.rec.m!=null)?(d.rec.p!==1&&d.rec.m!==1):null,"ক্লিন দিন","পিছলে পড়ার দিন"),
+  ].join("");
+  const last7=days.slice(-7).map(o=>o.d?.mood).filter(v=>v!=null);
+  const low=last7.filter(v=>v<=2).length;
+  const habitRows=HABITS.map(([k,l])=>{const n=filled.filter(o=>o.d.habits?.[k]).length;return `<div class="stat"><div class="v">${bn(n)}</div><div class="k">${l} (৩০ দিনে)</div></div>`}).join("");
+  return `
+  ${low>=5?`<div class="note bad">গত ৭ দিনের ${bn(low)} দিনই মুড খারাপ ছিল। কাছের কারো সাথে কথা বলো, আর একজন কাউন্সেলর বা সাইকিয়াট্রিস্ট দেখাও। জরুরি অবস্থায় ৯৯৯।</div>`:""}
+  <section class="card"><div class="card-head"><h2>মুড, গত ৩০ দিন</h2><span class="small muted">টানা ${bn(streak())} দিন জার্নালিং</span></div><div class="chart">${mood}</div></section>
+  <section class="card"><div class="card-head"><h2>ঘুম, গত ৩০ দিন</h2><span class="small muted">সবুজ দাগ = ৭ ঘণ্টা</span></div><div class="chart">${sleep}</div></section>
+  <section class="card"><h2>কোন জিনিস তোমার মুডে প্রভাব ফেলছে</h2>${patterns}<p class="small muted">এগুলো শুধু মিল, প্রমাণ না। যত বেশি দিন ট্র্যাক করবে, তত নির্ভরযোগ্য হবে।</p></section>
+  <section class="card"><h2>অভ্যাস</h2><div class="stats">${habitRows}</div></section>`;
+}
+
+function rGuide(){
+  return `
+  <section class="card"><h2>মূল নীতি</h2>
+    <p>যা জানো তা লেখার জন্য না, যা জানো না সেটা খুঁজে বের করার জন্য লেখো। কষ্টের কথা সৎভাবে লেখো। আর কৃতজ্ঞতা ও ভবিষ্যতের স্বপ্ন নিয়ে লিখলে মন ভালো থাকে।</p></section>
+  <section class="card"><h2>প্রতিদিন (~১৫ মিনিট)</h2>
+    <ul class="plain"><li><b>সকাল:</b> ১০টা চিন্তা লিখে ফেলো, আজকের ১টা ফোকাস বেছে নাও।</li>
+    <li><b>রাত:</b> চেক-ইন, ৩টা কৃতজ্ঞতা, ৫ মিনিট Free Flow। নেগেটিভ চিন্তা বারবার এলে CBT অংশটা পূরণ করো।</li></ul></section>
+  <section class="card"><h2>সাপ্তাহিক (শুক্রবার, ~২০ মিনিট)</h2>
+    <ul class="plain"><li>সপ্তাহের হিসাব আর WHO-5 স্কোর দেখো।</li><li>AI-এর ৫ প্রশ্নের উত্তর লেখো।</li><li>Best Possible Self: ১ বছর পরের ভালো জীবনটা লেখো।</li></ul></section>
+  <section class="card"><h2>৩ মাসের রোডম্যাপ</h2>
+    <ol class="road"><li>সপ্তাহ ১–২: শুধু সকালের Thought Dump আর ৩টা কৃতজ্ঞতা।</li><li>সপ্তাহ ৩–৪: রাতের চেক-ইন আর Free Flow যোগ করো।</li>
+    <li>মাস ২: সাপ্তাহিক রিভিউ যোগ করো।</li><li>মাস ২–৩: দরকার হলে ‘গভীর লেখা’ প্রোটোকল একবার।</li><li>মাস ৩ শেষে: ইনসাইট আর পুরনো লেখা মিলিয়ে দেখো।</li></ol></section>
+  <section class="card"><h2>ডেটা</h2>
+    <p class="small muted">${store?.mode==="cloud"?"তোমার লেখা Google অ্যাকাউন্টের সাথে সিঙ্ক হচ্ছে।":"এখন শুধু এই ডিভাইসে সেভ হচ্ছে।"} মাসে একবার ব্যাকআপ ডাউনলোড করে রাখো।</p>
+    ${view.dataMsg?`<p class="small">${esc(view.dataMsg)}</p>`:""}
+    <div class="row"><button class="btn" data-act="export">ব্যাকআপ ডাউনলোড</button>
+      <label class="btn ghost" for="import-file">ব্যাকআপ থেকে ফেরত আনো</label><input type="file" id="import-file" accept="application/json,.json" hidden>
+      ${store?.mode==="cloud"?`<button class="btn ghost" data-act="signout">লগআউট</button>`:""}</div></section>
+  <section class="card"><h2>নিয়ম</h2>
+    <ul class="plain"><li>একদিন মিস হলে পরের দিন আবার শুরু করো।</li><li>বানান বা সুন্দর লেখা নিয়ে ভাববে না। লেখা শুধু তোমার।</li>
+    <li>জার্নালিং থেরাপির বিকল্প না। ২ সপ্তাহের বেশি টানা মন খারাপ থাকলে বিশেষজ্ঞ দেখাও। জরুরি অবস্থায় ৯৯৯।</li></ul></section>`;
+}
+
+function recStreak(key){
+  const start=peek("recovery")?.start;if(!start)return {cur:0,best:0};
+  let cur=0,best=0,run=0;
+  for(let s=start;s<=today();s=addDays(s,1)){
+    if(peek("day-"+s)?.rec?.[key]===1)run=0;else run++;
+    best=Math.max(best,run);
+  }
+  cur=run;return {cur,best};
+}
+
+function rReset(){
+  const plan=doc("recovery");
+  if(!plan.start)return `
+  <section class="card">
+    <h2>রিসেট: পর্ন আর মাস্টারবেশনের অভ্যাস থেকে বের হওয়া</h2>
+    <p>এখানে যা লিখবে তা শুধু তোমার অ্যাকাউন্টে থাকবে, আর কেউ দেখতে পারবে না।</p>
+    <ul class="plain small">
+      <li><b>তাড়না এলে ঢেউয়ের মতো দেখো (Urge Surfing):</b> তাড়নার সাথে লড়াই না করে লক্ষ্য করো। এটা উঠে আবার নেমে যায়।</li>
+      <li><b>ট্রিগার লগ:</b> কখন, কোথায়, কোন অনুভূতিতে তাড়না আসে সেটা লিখে প্যাটার্ন বের করো।</li>
+      <li><b>যদি-তাহলে প্ল্যান:</b> ঝুঁকির মুহূর্তের জন্য আগে থেকেই ঠিক করে রাখো কী করবে।</li>
+      <li><b>পিছলে পড়লে লজ্জা না, বিশ্লেষণ:</b> “আমি পারি না” ভাবলে আবার পড়ার সম্ভাবনা বাড়ে। কী ঘটেছিল সেটা খুঁজে বের করো।</li>
+    </ul>
+    <button class="btn" data-act="recstart">আজ থেকে শুরু করো</button>
+  </section>`;
+  const id="day-"+view.rdate,d=doc(id);if(!d.rec)d.rec=blankRec();
+  const r=d.rec,ps=recStreak("p"),ms=recStreak("m"),isToday=view.rdate===today();
+  const reasons=(plan.reasons||[]).filter(x=>x&&x.trim());
+  const plans=(plan.ifthen||[]).filter(x=>x.if&&x.then);
+  const s=view.surf;
+  const surf=s?`
+  <section class="card surf">
+    <div class="card-head"><h2>তাড়নার ঢেউ পার হও</h2>${timerUI("surf",15,"১৫ মিনিট গাইড শুরু")}</div>
+    <p class="step" data-surfstep>${SURF_STEPS[0][1]}</p>
+    <div class="field"><span class="lbl">এখন তাড়না কতটা তীব্র (১–১০)</span>${numScale("before",s.before,1,10).replace(/data-set=/g,"data-ss=")}</div>
+    ${reasons.length?`<div class="field"><span class="lbl">কেন ছাড়ছি</span><ol class="reasons">${reasons.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>`:""}
+    ${plans.length?`<div class="field"><span class="lbl">আমার প্ল্যান</span><ul class="plain">${plans.map(x=>`<li>যদি ${esc(x.if)}, তাহলে <b>${esc(x.then)}</b></li>`).join("")}</ul></div>`:""}
+    <div class="field"><span class="lbl">এখনই করতে পারো</span><ul class="plain small">${ALTS.map(a=>`<li>${a}</li>`).join("")}</ul></div>
+    <div class="field"><span class="lbl">কী ট্রিগার করেছে</span><div class="chips">${TRIGGERS.map(t=>`<button type="button" class="chip" data-st="triggers" data-v="${t}" aria-pressed="${s.triggers.includes(t)}" style="${s.triggers.includes(t)?"background:var(--accent-soft);border-color:var(--accent)":""}">${t}</button>`).join("")}</div></div>
+    <div class="field"><span class="lbl">এই মুহূর্তে আমি কি… (HALT)</span><div class="chips">${HALT.map(t=>`<button type="button" class="chip" data-st="halt" data-v="${t}" aria-pressed="${s.halt.includes(t)}" style="${s.halt.includes(t)?"background:var(--accent-soft);border-color:var(--accent)":""}">${t}</button>`).join("")}</div></div>
+    <div class="field"><span class="lbl">শেষে তীব্রতা কতটা (১–১০)</span>${numScale("after",s.after,1,10).replace(/data-set=/g,"data-ss=")}</div>
+    <div class="field"><span class="lbl">কী হলো</span>${OUTCOMES.map(([k,l])=>`<button type="button" class="btn ${s.outcome===k?"":"ghost"}" data-so="${k}">${l}</button>`).join(" ")}</div>
+    <textarea id="surf-note" data-sn placeholder="কী সাহায্য করেছে, বা কী ভাবছিলে (ঐচ্ছিক)" style="min-height:70px">${esc(s.note)}</textarea>
+    <div class="row"><button class="btn" data-act="surfsave" ${s.outcome?"":"disabled"}>লগ সেভ করো</button><button class="btn ghost" data-act="surfcancel">বাতিল</button></div>
+  </section>`:"";
+
+  const lapsed=r.p===1||r.m===1;
+  const urges=(r.urges||[]).map(u=>`<div class="urge"><span>${bn(u.t)} · তীব্রতা ${bn(u.before??"–")} → ${bn(u.after??"–")}</span><span class="muted">${esc((u.triggers||[]).join(", ")||"ট্রিগার লেখা নেই")} · ${esc((OUTCOMES.find(o=>o[0]===u.outcome)||["",""])[1])}</span></div>`).join("");
+
+  return `
+  <section class="card">
+    <div class="stats">
+      <div class="stat"><div class="big">${bn(ps.cur)}</div><div class="k">দিন পর্ন-মুক্ত · সেরা ${bn(ps.best)}</div></div>
+      <div class="stat"><div class="big">${bn(ms.cur)}</div><div class="k">দিন মাস্টারবেশন-মুক্ত · সেরা ${bn(ms.best)}</div></div>
+    </div>
+    ${s?"":`<button class="sos" data-act="surf">এখন তাড়না হচ্ছে</button>`}
+    <p class="small muted">শুরু ${fmtShort(plan.start)} থেকে। পিছলে পড়লে কাউন্ট শূন্য হয়, কিন্তু ‘সেরা’ রেকর্ড আর শেখাটা থেকে যায়।</p>
+  </section>
+  ${surf}
+  <div class="daybar">
+    <button class="iconbtn" data-rnav="-1" aria-label="আগের দিন">‹</button>
+    <h2>${fmtDate(view.rdate)}</h2>
+    <button class="iconbtn" data-rnav="1" aria-label="পরের দিন" ${isToday?"disabled":""}>›</button>
+  </div>
+  <section class="card" data-doc="${id}">
+    <div class="card-head"><h2>দিনের হিসাব</h2><span class="when">রাতে</span></div>
+    <div class="field"><span class="lbl">পর্ন</span>${scale("rec.p",r.p,["দেখিনি","দেখেছি"],0)}</div>
+    <div class="field"><span class="lbl">মাস্টারবেশন</span>${scale("rec.m",r.m,["করিনি","করেছি"],0)}</div>
+    ${urges?`<div class="field"><span class="lbl">এই দিনের তাড়না লগ</span>${urges}</div>`:`<p class="small muted">এই দিনে কোনো তাড়না লগ করা হয়নি।</p>`}
+    <label class="lbl" for="rec-reflect">আজ সবচেয়ে ঝুঁকির মুহূর্ত কোনটা ছিল? কাল সেটা কীভাবে সামলাবে?</label>
+    <textarea id="rec-reflect" data-f="rec.reflect" style="min-height:80px">${esc(r.reflect)}</textarea>
+  </section>
+  ${lapsed?`
+  <section class="card" data-doc="${id}">
+    <h2>পিছলে পড়েছ। এটা শেষ না, তথ্য।</h2>
+    <p class="small">একবার পড়ে যাওয়া মানে তুমি ব্যর্থ না। “আমি কখনো পারব না” ভাবনাটাই সবচেয়ে বেশি আবার পড়ার দিকে ঠেলে দেয়। লজ্জা না পেয়ে খুঁজে বের করো কোন শিকল ধরে এটা ঘটল।</p>
+    <label class="lbl" for="rv-b">আগে কী ঘটছিল? (কোথায়, কখন, কী করছিলে)</label><textarea id="rv-b" data-f="rec.review.before" style="min-height:64px">${esc(r.review.before)}</textarea>
+    <label class="lbl" for="rv-f">তখন কেমন লাগছিল? (একা, বোর, স্ট্রেস, ক্লান্ত…)</label><textarea id="rv-f" data-f="rec.review.feeling" style="min-height:64px">${esc(r.review.feeling)}</textarea>
+    <label class="lbl" for="rv-t">মাথায় কোন চিন্তা এসেছিল? (যেমন “শুধু একবার দেখি”)</label><textarea id="rv-t" data-f="rec.review.thought" style="min-height:64px">${esc(r.review.thought)}</textarea>
+    <label class="lbl" for="rv-m">কোন মুহূর্তে থামতে পারতে?</label><textarea id="rv-m" data-f="rec.review.moment" style="min-height:64px">${esc(r.review.moment)}</textarea>
+    <label class="lbl" for="rv-n">পরের বার ঠিক ওই মুহূর্তে কী করবে? (এটা নিচের যদি-তাহলে প্ল্যানে যোগ করো)</label><textarea id="rv-n" data-f="rec.review.next" style="min-height:64px">${esc(r.review.next)}</textarea>
+    <label class="lbl" for="rv-k">তোমার কাছের কোনো বন্ধু এই অবস্থায় থাকলে তাকে কী বলতে? নিজেকে সেটাই বলো।</label><textarea id="rv-k" data-f="rec.review.kind" style="min-height:64px">${esc(r.review.kind)}</textarea>
+  </section>`:""}
+  <section class="card" data-doc="recovery">
+    <h2>আমার প্ল্যান</h2>
+    <div class="field"><span class="lbl">কেন ছাড়ছি (তাড়নার সময় এগুলো দেখাবে)</span>
+      ${plan.reasons.map((t,i)=>`<input id="rs-${i}" data-f="reasons.${i}" value="${esc(t)}" placeholder="${["যেমন: পড়ায় মন দিতে চাই","যেমন: নিজের ওপর সম্মান ফিরে পেতে চাই","","",""][i]}" aria-label="কারণ ${bn(i+1)}">`).join("")}</div>
+    <div class="field"><span class="lbl">যদি-তাহলে প্ল্যান</span>
+      ${plan.ifthen.map((x,i)=>`<div class="ifthen"><input id="if-${i}" data-f="ifthen.${i}.if" value="${esc(x.if)}" placeholder="${i?"যদি…":"যদি রাতে বিছানায় ফোন হাতে থাকে"}" aria-label="যদি ${bn(i+1)}"><input id="then-${i}" data-f="ifthen.${i}.then" value="${esc(x.then)}" placeholder="${i?"তাহলে…":"তাহলে ফোন অন্য রুমে চার্জে দেব"}" aria-label="তাহলে ${bn(i+1)}"></div>`).join("")}</div>
+    <div class="field"><span class="lbl">পরিবেশ ঠিক করা</span><div class="chips">${ENV.map(([k,l])=>`<label class="chip"><input type="checkbox" id="env-${k}" data-f="env.${k}" ${plan.env?.[k]?"checked":""}>${l}</label>`).join("")}</div></div>
+  </section>
+  ${rResetPatterns(plan.start)}
+  <section class="card">
+    <h2>কখন সাহায্য নেবে</h2>
+    <p class="small">চেষ্টা করেও বারবার নিয়ন্ত্রণ হারালে, পড়াশোনা বা সম্পর্কের ক্ষতি হলে, বা খুব বেশি লজ্জা ও মন খারাপ থাকলে একজন সাইকিয়াট্রিস্ট বা ক্লিনিক্যাল সাইকোলজিস্টের সাথে কথা বলো। গবেষণায় ACT আর CBT থেরাপিতে ভালো ফল দেখা গেছে। এটা লজ্জার কিছু না, অনেকেই এই সাহায্য নেয়।</p>
+  </section>`;
+}
+
+function rResetPatterns(start){
+  const ds=[];for(let i=29;i>=0;i--){const s=addDays(today(),-i);ds.push({s,d:peek("day-"+s)})}
+  const cal=ds.map(({s,d})=>{const r=d?.rec;let c="";if(r){const lp=r.p===1||r.m===1;if(lp)c=(r.p===1&&r.m===1)?"lapse":"half";else if(r.p===0||r.m===0)c="ok"}
+    return `<span class="${c}" title="${fmtShort(s)}"></span>`}).join("");
+  const urges=ds.flatMap(({d})=>d?.rec?.urges||[]);
+  const tcount={};urges.forEach(u=>(u.triggers||[]).concat(u.halt||[]).forEach(t=>tcount[t]=(tcount[t]||0)+1));
+  const top=Object.entries(tcount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const max=top.length?top[0][1]:1;
+  const buckets=[["সকাল (৫–১২)",5,12],["দুপুর (১২–৫)",12,17],["সন্ধ্যা (৫–৯)",17,21],["রাত (৯–১)",21,25],["গভীর রাত (১–৫)",1,5]];
+  const bcount=buckets.map(([l,a,b])=>[l,urges.filter(u=>{let h=Number((u.t||"0").split(":")[0]);if(a===21&&h<1)h+=24;return h>=a&&h<b}).length]);
+  const bmax=Math.max(1,...bcount.map(x=>x[1]));
+  const won=urges.filter(u=>u.outcome&&u.outcome!=="lost").length;
+  const bar=(l,c,m)=>`<div class="barrow"><span>${esc(l)}</span><div class="track"><div class="fill" style="width:${c/m*100}%"></div></div><span class="c">${bn(c)}</span></div>`;
+  return `<section class="card">
+    <h2>প্যাটার্ন, গত ৩০ দিন</h2>
+    <div class="cal">${cal}</div>
+    <div class="legend"><span><i style="background:var(--good)"></i>ক্লিন</span><span><i style="background:var(--warn)"></i>একটায় পিছলে পড়া</span><span><i style="background:var(--bad)"></i>দুটোতেই</span><span><i style="background:var(--sunk)"></i>লেখা নেই</span></div>
+    ${urges.length?`
+    <p><b>${bn(urges.length)}টা তাড়নার ${bn(won)}টা পার হয়েছ</b> <span class="muted">(${bn(Math.round(won/urges.length*100))}%)</span></p>
+    <h3>সবচেয়ে বেশি ট্রিগার</h3><div class="bars">${top.map(([t,c])=>bar(t,c,max)).join("")}</div>
+    <h3>কোন সময়ে তাড়না বেশি আসে</h3><div class="bars">${bcount.map(([l,c])=>bar(l,c,bmax)).join("")}</div>
+    <p class="small muted">যে সময় আর ট্রিগার সবচেয়ে বেশি, সেটার জন্য একটা যদি-তাহলে প্ল্যান বানাও।</p>`
+    :`<p class="small muted">তাড়না এলে ‘এখন তাড়না হচ্ছে’ বোতাম চেপে লগ করো। কয়েকটা লগ হলে এখানে তোমার ট্রিগার আর ঝুঁকির সময় দেখাবে।</p>`}
+  </section>`;
+}
+
+/* ---------- timer ---------- */
+let timer=null;
+function tick(){
+  const st=document.querySelector("[data-surfstep]");
+  if(st&&timer&&timer.key==="surf"){const el=(Date.now()-(timer.end-15*60000))/60000;let txt=SURF_STEPS[0][1];SURF_STEPS.forEach(([m,t])=>{if(el>=m)txt=t});if(st.textContent!==txt)st.textContent=txt}
+  document.querySelectorAll("[data-tdisp]").forEach(el=>{
+    const k=el.dataset.tdisp,btn=document.querySelector(`[data-timer="${k}"]`);
+    if(timer&&timer.key===k){
+      const left=Math.max(0,timer.end-Date.now());
+      el.textContent=left?bn(z(Math.floor(left/60000))+":"+z(Math.floor(left/1000)%60)):"সময় শেষ। চাইলে আরও লেখো।";
+      if(btn)btn.textContent=left?"থামাও":"আবার শুরু";
+      if(!left)timer.finished=true;
+    }else{el.textContent="";if(btn&&btn.dataset.label)btn.textContent=btn.dataset.label}
+  });
+}
+setInterval(()=>{if(timer&&!timer.finished)tick()},1000);
+
+/* ---------- events ---------- */
+document.getElementById("tabs").addEventListener("click",e=>{
+  const b=e.target.closest("[data-tab]");if(!b)return;
+  view.tab=b.dataset.tab;try{history.replaceState(null,"","#"+view.tab)}catch(_){}
+  render();window.scrollTo(0,0);
+});
+main.addEventListener("input",e=>{
+  const el=e.target,f=el.dataset.f;
+  if(el.hasAttribute("data-sn")&&view.surf){view.surf.note=el.value;return}
+  if(!f)return;
+  const host=el.closest("[data-doc]");if(!host)return;
+  const id=host.dataset.doc,d=doc(id);
+  setPath(d,f,el.type==="checkbox"?el.checked:el.value);
+  touch(id);
+  if(f==="bed"||f==="wake"){const p=host.querySelector("p.small.muted");if(p&&id.startsWith("day-")){const h=sleepHrs(d);p.textContent="ঘুম: "+(h==null?"সময় দুটো দিলে হিসাব হবে":fix(h)+" ঘণ্টা")}}
+  if(el.tagName==="TEXTAREA"){const c=el.nextElementSibling;if(c&&c.classList.contains("small"))c.textContent=bn(words(el.value))+" শব্দ";
+    const btn=host.querySelector(`[data-act="pbdone"]`);if(btn&&f.endsWith(".text"))btn.disabled=words(el.value)<20}
+});
+main.addEventListener("click",async e=>{
+  const t=e.target.closest("button");if(!t)return;
+  const host=t.closest("[data-doc]"),id=host?.dataset.doc;
+  if(t.dataset.set){const d=doc(id),v=Number(t.dataset.v);setPath(d,t.dataset.set,getPath(d,t.dataset.set)===v?null:v);touch(id);render();return}
+  if(t.dataset.focus){const d=doc(id),i=Number(t.dataset.focus);d.focus=d.focus===i?null:i;touch(id);render();return}
+  if(t.dataset.nav){view.date=t.dataset.nav==="0"?today():addDays(view.date,Number(t.dataset.nav));if(view.date>today())view.date=today();render();return}
+  if(t.dataset.wnav){view.week=addDays(view.week,Number(t.dataset.wnav));view.aiMsg="";render();return}
+  if(t.dataset.timer){const k=t.dataset.timer;if(!t.dataset.label)t.dataset.label=t.textContent;
+    if(timer&&timer.key===k&&!timer.finished){timer=null}else{timer={key:k,end:Date.now()+Number(t.dataset.min)*60000}}
+    tick();if(k==="surf")return;const ta=t.closest(".field,section,.sess")?.querySelector("textarea");if(ta&&timer)ta.focus();return}
+  if(t.dataset.pb){view.pb=t.dataset.pb;render();return}
+  if(t.dataset.rnav){view.rdate=addDays(view.rdate,Number(t.dataset.rnav));if(view.rdate>today())view.rdate=today();render();return}
+  if(t.dataset.ss&&view.surf){const k=t.dataset.ss,v=Number(t.dataset.v);view.surf[k]=view.surf[k]===v?null:v;render();return}
+  if(t.dataset.st&&view.surf){const a=view.surf[t.dataset.st],v=t.dataset.v,i=a.indexOf(v);if(i<0)a.push(v);else a.splice(i,1);render();return}
+  if(t.dataset.so&&view.surf){view.surf.outcome=t.dataset.so;render();return}
+  const act=t.dataset.act;
+  if(act==="signin"){const p=new firebase.auth.GoogleAuthProvider();view.authMsg="";
+    try{await firebase.auth().signInWithPopup(p)}catch(err){
+      if(err&&(err.code==="auth/popup-blocked"||err.code==="auth/operation-not-supported-in-this-environment"))firebase.auth().signInWithRedirect(p);
+      else if(!(err&&err.code==="auth/popup-closed-by-user")){view.authMsg="লগইন হয়নি: "+(err&&err.code||"অজানা সমস্যা");render()}}
+    return}
+  if(act==="signout"){firebase.auth().signOut();return}
+  if(act==="export"){const blob=new Blob([JSON.stringify({app:"monkhata",exported:new Date().toISOString(),docs})],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="monkhata-backup-"+today()+".json";document.body.appendChild(a);a.click();a.remove();
+    view.dataMsg="ব্যাকআপ ডাউনলোড হয়েছে।";render();return}
+  if(act==="recstart"){const p=doc("recovery");p.start=today();touch("recovery");render();return}
+  if(act==="surf"){view.surf={start:Date.now(),before:null,after:null,triggers:[],halt:[],outcome:null,note:""};render();window.scrollTo(0,0);return}
+  if(act==="surfcancel"){view.surf=null;if(timer&&timer.key==="surf")timer=null;render();return}
+  if(act==="surfsave"){const s=view.surf,now=new Date(s.start),dId="day-"+ymd(now),d=doc(dId);if(!d.rec)d.rec=blankRec();if(!d.rec.urges)d.rec.urges=[];
+    d.rec.urges.push({t:z(now.getHours())+":"+z(now.getMinutes()),before:s.before,after:s.after,triggers:s.triggers,halt:s.halt,outcome:s.outcome,note:s.note});
+    touch(dId);view.surf=null;view.rdate=ymd(now);if(timer&&timer.key==="surf")timer=null;render();return}
+  if(act==="newpb"){const inp=document.getElementById("pb-title");const title=inp.value.trim();if(!title){inp.focus();inp.placeholder="আগে ঘটনার একটা ছোট নাম দাও";return}
+    const nid="pb-"+Date.now().toString(36);const p=doc(nid);p.title=title;touch(nid);view.pb=nid;render();return}
+  if(act==="pbdone"){const i=Number(t.dataset.i),p=doc(id);p.sessions[i].done=true;p.sessions[i].date=today();touch(id);timer=null;render();return}
+  if(act==="genq")return genQuestions(id);
+});
+
+async function genQuestions(id){
+  const topic=(doc(id).ai.topic||"").trim();
+  if(!topic){view.aiMsg="আগে বিষয়টা লেখো।";render();return}
+  const prompt=`আমি জার্নালিং করছি। এই সপ্তাহের বিষয়: "${topic}"। আমাকে আত্মবিশ্লেষণে সাহায্য করতে বাংলায় ঠিক ৫টা খোলা প্রশ্ন দাও। প্রশ্নগুলো নরম, বিচারহীন আর নির্দিষ্ট হবে, যাতে লিখতে লিখতে আসল কারণ বের হয়।`;
+  try{await navigator.clipboard.writeText(prompt);view.aiMsg="কপি হয়েছে। ChatGPT বা Claude-এ পেস্ট করো, তারপর পাওয়া ৫টা প্রশ্ন নিচের ঘরগুলোতে বসাও।"}
+  catch(e){view.aiMsg="কপি করা গেল না। ChatGPT বা Claude-কে লেখো: "+prompt}
+  render();
+}
+main.addEventListener("change",async e=>{
+  if(e.target.id!=="import-file")return;
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const obj=JSON.parse(await f.text()),src=obj.docs||obj;let n=0;
+    for(const [k,v] of Object.entries(src)){
+      if(!/^(day-|week-|pb-|recovery$)/.test(k)||!v||typeof v!=="object")continue;
+      docs[k]=v;touch(k);n++;
+    }
+    view.dataMsg=bn(n)+"টা এন্ট্রি ফেরত আনা হয়েছে।";
+  }catch(_){view.dataMsg="ফাইলটা পড়া যায়নি। মনখাতার ব্যাকআপ ফাইল বেছে নাও।"}
+  render();
+});
+if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
+const h=(location.hash||"").slice(1);
+if(["today","week","deep","reset","insights","guide"].includes(h))view.tab=h;
+init();
+</script>
+
+</html>

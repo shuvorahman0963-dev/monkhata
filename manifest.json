@@ -1,0 +1,16 @@
+{
+  "name": "মনখাতা",
+  "short_name": "মনখাতা",
+  "description": "জার্নালিং আর মানসিক-শারীরিক স্বাস্থ্য ট্র্যাকার",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F1F3EE",
+  "theme_color": "#2D6B62",
+  "lang": "bn",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
