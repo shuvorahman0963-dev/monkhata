@@ -1,5 +1,5 @@
 // Offline shell: the page itself is network-first, libraries and fonts are cache-first.
-const CACHE = "monkhata-v2";
+const CACHE = "monkhata-v3";
 const SHELL = ["./", "index.html", "firebase-config.js", "manifest.json", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -16,7 +16,8 @@ self.addEventListener("fetch", e => {
   const isOwn = url.origin === self.location.origin;
   if (!isLib && !isOwn) return;
   if (isOwn) {
-    e.respondWith(fetch(req).then(res => {
+    // no-cache: always revalidate so app updates show up right away
+    e.respondWith(fetch(req.url, { cache: "no-cache" }).then(res => {
       const copy = res.clone();
       caches.open(CACHE).then(c => c.put(req, copy));
       return res;
